@@ -1,61 +1,53 @@
 <?php
 session_start();
-include('../includes/dbcon.php');
+include('../includes/dbcon.php'); // Adjust path if needed
 
-// Get student’s admission number from session
-$student_id = $_SESSION['userId'];
-$query = "SELECT admissionNumber FROM tblstudents WHERE Id = $student_id";
-$result = $conn->query($query);
-$admissionNo = $result->fetch_assoc()['admissionNumber'];
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-if (isset($_POST['viewType']) && isset($_POST['dateInput'])) {
-    $viewType = $_POST['viewType'];
-    $dateInput = $_POST['dateInput'];
-
-    $query = "";
-
-    if ($viewType == 'day') {
-        $query = "
-            SELECT tblattendance.status, tblattendance.dateTimeTaken AS date, 
-                   tblclass.className, tblclassarms.classArmName, 
-                   tblsessionterm.sessionName, tblterm.termName
-            FROM tblattendance
-            INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
-            INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
-            INNER JOIN tblsessionterm ON tblsessionterm.Id = tblattendance.sessionTermId
-            INNER JOIN tblterm ON tblterm.Id = tblsessionterm.termId
-            WHERE tblattendance.admissionNo = '$admissionNo' 
-              AND DATE(tblattendance.dateTimeTaken) = '$dateInput'";
-    } else {
-        $query = "
-            SELECT tblattendance.status, tblattendance.dateTimeTaken AS date, 
-                   tblclass.className, tblclassarms.classArmName, 
-                   tblsessionterm.sessionName, tblterm.termName
-            FROM tblattendance
-            INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
-            INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
-            INNER JOIN tblsessionterm ON tblsessionterm.Id = tblattendance.sessionTermId
-            INNER JOIN tblterm ON tblterm.Id = tblsessionterm.termId
-            WHERE tblattendance.admissionNo = '$admissionNo' 
-              AND MONTH(tblattendance.dateTimeTaken) = MONTH('$dateInput')";
-    }
-
-    $result = $conn->query($query);
-    $records = [];
-
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $records[] = [
-                'date' => $row['date'],
-                'className' => $row['className'],
-                'classArmName' => $row['classArmName'],
-                'sessionName' => $row['sessionName'],
-                'termName' => $row['termName'],
-                'status' => $row['status'] == '1' ? 'Present' : 'Absent'
-            ];
-        }
-    }
-    echo json_encode($records);
-} else {
-    echo json_encode([]);
+// Check if the student is logged in
+if (!isset($_SESSION['userId'])) {
+    die("You need to log in to access this page.");
 }
+
+$student_id = $_SESSION['userId'];
+$viewType = $_POST['viewType'];
+$dateInput = $_POST['dateInput'];
+
+// Build SQL query based on view type (day or month)
+if ($viewType === 'day') {
+    $query = "SELECT Att_date, att_hr_1, att_hr_2, att_hr_3, att_hr_4, att_hr_5 
+              FROM tblattendance 
+              WHERE std_id = ? AND Att_date = ?";
+} else {
+    $query = "SELECT Att_date, att_hr_1, att_hr_2, att_hr_3, att_hr_4, att_hr_5 
+              FROM tblattendance 
+              WHERE std_id = ? AND Att_date LIKE ?";
+    $dateInput = substr($dateInput, 0, 7) . '%'; // Format for month search (YYYY-MM)
+}
+
+$stmt = $conn->prepare($query);
+$stmt->bind_param("is", $student_id, $dateInput);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$data = [];
+while ($row = $result->fetch_assoc()) {
+    // Calculate overall attendance status for the day based on individual hours
+    $status = (array_sum([$row['att_hr_1'], $row['att_hr_2'], $row['att_hr_3'], $row['att_hr_4'], $row['att_hr_5']]) === 5)
+        ? 'Present' : 'Absent';
+
+    $data[] = [
+        'date' => $row['Att_date'],
+        'att_hr_1' => $row['att_hr_1'],
+        'att_hr_2' => $row['att_hr_2'],
+        'att_hr_3' => $row['att_hr_3'],
+        'att_hr_4' => $row['att_hr_4'],
+        'att_hr_5' => $row['att_hr_5'],
+        'status' => $status,
+    ];
+}
+
+header('Content-Type: application/json');
+echo json_encode($data);

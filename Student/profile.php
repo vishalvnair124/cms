@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../includes/dbcon.php'); // Adjust path if needed
+include('../includes/dbcon.php'); // Ensure path is correct
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
@@ -8,36 +8,33 @@ ini_set('display_errors', 1);
 
 // Check if the student is logged in
 if (!isset($_SESSION['userId'])) {
-    die("You need to log in to access this page.");
+    die("Unauthorized access.");
 }
 
-// Initialize variables
-$firstName = $lastName = $email = $phone = $admissionNumber = "";
-
-// Get the student’s ID from the session
+// Get student ID from the session
 $student_id = $_SESSION['userId'];
 
-// Fetch student details from the database
-$query = "SELECT firstName, lastName, admissionNumber, email, phone_number 
-          FROM tblstudents 
-          WHERE Id = $student_id";
+// Initialize variables to store student details
+$studentData = [];
 
-$result = $conn->query($query);
+// Query to fetch all student details
+$query = "SELECT * FROM tblstudents WHERE std_id = ?";
+
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $student_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
 if ($result && $result->num_rows == 1) {
-    $row = $result->fetch_assoc();
-    $firstName = $row['firstName'];
-    $lastName = $row['lastName'];
-    $admissionNumber = $row['admissionNumber'];
-    $email = $row['email'];
-    $phone = $row['phone_number'];
+    $studentData = $result->fetch_assoc();
 } else {
     echo "<script>alert('Student record not found.');</script>";
 }
-
-// Form HTML
+$stmt->close();
 ?>
+
+<!-- HTML Form to Display and Update Student Data -->
 <style>
-    /* Same CSS as before */
     body {
         font-family: Arial, sans-serif;
         background-color: #a9c2f9;
@@ -67,7 +64,8 @@ if ($result && $result->num_rows == 1) {
         color: #555;
     }
 
-    form input {
+    form input,
+    form textarea {
         width: 100%;
         padding: 10px;
         margin-top: 5px;
@@ -98,27 +96,56 @@ if ($result && $result->num_rows == 1) {
         background-color: #534edc;
     }
 </style>
+
 <div class="container">
-    <h2>Update Your Profile</h2>
-
+    <h2>Your Profile</h2>
     <form id="updateForm">
-        <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" name="firstName" value="<?php echo htmlspecialchars($firstName); ?>" readonly>
+        <label for="std_firstName">First Name:</label>
+        <input type="text" id="std_firstName" name="std_firstName"
+            value="<?php echo htmlspecialchars($studentData['std_firstName'] ?? ''); ?>" readonly>
 
-        <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" name="lastName" value="<?php echo htmlspecialchars($lastName); ?>" readonly>
+        <label for="std_lastName">Last Name:</label>
+        <input type="text" id="std_lastName" name="std_lastName"
+            value="<?php echo htmlspecialchars($studentData['std_lastName'] ?? ''); ?>" readonly>
 
-        <label for="admissionNumber">Admission Number:</label>
-        <input type="text" id="admissionNumber" name="admissionNumber" value="<?php echo htmlspecialchars($admissionNumber); ?>" readonly>
+        <label for="std_otherName">Other Name:</label>
+        <input type="text" id="std_otherName" name="std_otherName"
+            value="<?php echo htmlspecialchars($studentData['std_otherName'] ?? ''); ?>" readonly>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+        <label for="std_admissionNumber">Admission Number:</label>
+        <input type="text" id="std_admissionNumber" name="std_admissionNumber"
+            value="<?php echo htmlspecialchars($studentData['std_admissionNumber'] ?? ''); ?>" readonly>
 
-        <label for="phone">Phone Number:</label>
-        <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" required>
+        <label for="std_email">Email:</label>
+        <input type="email" id="std_email" name="std_email"
+            value="<?php echo htmlspecialchars($studentData['std_email'] ?? ''); ?>" required>
 
-        <label for="password">New Password (Optional):</label>
-        <input type="password" id="password" name="password">
+        <label for="std_phone_number">Phone Number:</label>
+        <input type="text" id="std_phone_number" name="std_phone_number"
+            value="<?php echo htmlspecialchars($studentData['std_phone_number'] ?? ''); ?>" required>
+
+        <label for="stud_dob">Date of Birth:</label>
+        <input type="date" id="stud_dob" name="stud_dob"
+            value="<?php echo htmlspecialchars($studentData['stud_dob'] ?? ''); ?>" readonly>
+
+        <label for="std_address">Address:</label>
+        <textarea id="std_address" name="std_address"><?php echo htmlspecialchars($studentData['std_address'] ?? ''); ?></textarea>
+
+        <label for="std_aadhar_no">Aadhar Number:</label>
+        <input type="text" id="std_aadhar_no" name="std_aadhar_no"
+            value="<?php echo htmlspecialchars($studentData['std_aadhar_no'] ?? ''); ?>" readonly>
+
+        <label for="std_parent_name">Parent's Name:</label>
+        <input type="text" id="std_parent_name" name="std_parent_name"
+            value="<?php echo htmlspecialchars($studentData['std_parent_name'] ?? ''); ?>" readonly>
+
+        <label for="std_parent_ph">Parent's Phone:</label>
+        <input type="text" id="std_parent_ph" name="std_parent_ph"
+            value="<?php echo htmlspecialchars($studentData['std_parent_ph'] ?? ''); ?>" required>
+
+        <label for="std_password">Password:</label>
+        <input type="password" id="std_password" name="std_password"
+            value="" placeholder="Enter new password (optional)">
 
         <button type="submit" class="btn">Update Profile</button>
     </form>

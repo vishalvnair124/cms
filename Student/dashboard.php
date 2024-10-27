@@ -8,7 +8,7 @@ ini_set('display_errors', 1);
 
 // Check if the student is logged in
 if (!isset($_SESSION['userId'])) {
-    die("Unauthorized access.");
+    die("You need to log in to access this page.");
 }
 
 // Get the student ID from session
@@ -20,30 +20,46 @@ $query = "
            es.marks_obtained, es.status
     FROM tblexam_stu es
     INNER JOIN tblexam e ON es.exam_id = e.exam_id
-    WHERE es.student_id = $student_id
+    WHERE es.std_id = ? 
     ORDER BY e.exam_date DESC
     LIMIT 1"; // Fetch only the latest exam result
 
-$result = $conn->query($query);
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $student_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
-// Fetch today's attendance
-$admissionNumberQuery = "SELECT admissionNumber FROM tblstudents WHERE Id = $student_id";
-$admissionResult = $conn->query($admissionNumberQuery);
-$admissionNo = $admissionResult->fetch_assoc()['admissionNumber'];
+// Handle attendance based on view type (day or month)
+$viewType = isset($_POST['viewType']) ? $_POST['viewType'] : 'day';
+$dateInput = isset($_POST['dateInput']) ? $_POST['dateInput'] : date('Y-m-d');
 
-$currentDate = date('Y-m-d'); // Get today's date
-$attendanceQuery = "
-    SELECT tblattendance.status, tblattendance.dateTimeTaken AS date, 
-           tblclass.className, tblclassarms.classArmName
-    FROM tblattendance
-    INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
-    INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
-    WHERE tblattendance.admissionNo = '$admissionNo' 
-      AND DATE(tblattendance.dateTimeTaken) = '$currentDate'";
+if ($viewType === 'day') {
+    $attendanceQuery = "SELECT Att_date, att_hr_1, att_hr_2, att_hr_3, att_hr_4, att_hr_5 
+                        FROM tblattendance 
+                        WHERE std_id = ? AND Att_date = ?";
+    $stmt = $conn->prepare($attendanceQuery);
+    $stmt->bind_param("is", $student_id, $dateInput);
+} else {
+    $dateInput = substr($dateInput, 0, 7) . '%'; // Format for month search (YYYY-MM)
+    $attendanceQuery = "SELECT Att_date, att_hr_1, att_hr_2, att_hr_3, att_hr_4, att_hr_5 
+                        FROM tblattendance 
+                        WHERE std_id = ? AND Att_date LIKE ?";
+    $stmt = $conn->prepare($attendanceQuery);
+    $stmt->bind_param("is", $student_id, $dateInput);
+}
+$stmt->execute();
+$attendanceResult = $stmt->get_result();
 
-$attendanceResult = $conn->query($attendanceQuery);
+// Fetch notifications from the database
+$notificationQuery = "SELECT notification_title, notification_text
+                      FROM tblnotification 
+                      WHERE notification_status = 1 
+                      ORDER BY notification_id ";
+$notificationStmt = $conn->prepare($notificationQuery);
+$notificationStmt->execute();
+$notificationResult = $notificationStmt->get_result();
+
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -73,6 +89,8 @@ $attendanceResult = $conn->query($attendanceQuery);
             margin-bottom: 20px;
             color: #333;
         }
+
+
 
         table {
             width: 100%;
@@ -113,10 +131,114 @@ $attendanceResult = $conn->query($attendanceQuery);
             background-color: #534edc;
         }
     </style>
+    <style>
+        .notification-box {
+            max-height: 300px;
+            /* Increase the maximum height */
+            overflow: hidden;
+            /* Hide overflow */
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            /* Increase padding */
+            margin-bottom: 20px;
+            white-space: nowrap;
+            /* Prevent line breaks */
+        }
+
+        .notification-title {
+            font-weight: bold;
+            /* Make title bold */
+            font-size: 1.2em;
+            /* Increase title font size */
+        }
+
+        .notification {
+            display: inline-block;
+            /* Inline block for notifications */
+            padding: 15px 25px;
+            /* Increase padding for notifications */
+            border-radius: 5px;
+            margin-right: 10px;
+            /* Space between notifications */
+            background-color: #e3f2fd;
+            /* Light background color for notifications */
+            transition: transform 0.3s;
+            /* Smooth transition for hover effect */
+        }
+
+        .notification-message {
+            font-size: 1em;
+            /* Increase message font size */
+        }
+
+        .notification-container {
+            display: flex;
+            /* Use flexbox for alignment */
+            animation: scroll-left 40s linear infinite;
+            /* Adjust speed for faster scrolling */
+        }
+
+
+
+        .notification {
+            display: inline-block;
+            /* Inline block for notifications */
+            padding: 15px 25px;
+            /* Increase padding for notifications */
+            border-radius: 5px;
+            margin-right: 10px;
+            /* Space between notifications */
+            background-color: #e3f2fd;
+            /* Light background color for notifications */
+            transition: transform 0.3s;
+            /* Smooth transition for hover effect */
+        }
+
+        .notification:hover {
+            /* transform: scale(1.05); */
+            /* Slightly enlarge on hover */
+            background-color: #bbdefb;
+            /* Darker shade on hover */
+        }
+
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(0);
+                /* Start at the original position */
+            }
+
+            100% {
+                transform: translateX(-100%);
+                /* Move to the left until just off the left side */
+            }
+        }
+    </style>
+
 </head>
 
 <body>
     <div class="container">
+        <!-- Notification Box -->
+        <div class="notification-box">
+            <h3>Notifications</h3>
+            <div class="notification-container">
+                <?php if ($notificationResult->num_rows > 0): ?>
+                    <?php while ($notification = $notificationResult->fetch_assoc()): ?>
+                        <div class="notification">
+                            <div class="notification-title"><?php echo htmlspecialchars($notification['notification_title']); ?></div>
+                            <div class="notification-message"><?php echo htmlspecialchars($notification['notification_text']); ?></div>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <div class="notification">No new notifications.</div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+
+
         <h2>Your Last Published Exam Result</h2>
 
         <?php if ($result->num_rows > 0): ?>
@@ -149,31 +271,43 @@ $attendanceResult = $conn->query($attendanceQuery);
             <p>No exam results found.</p>
         <?php endif; ?>
 
-        <h2>Your Today's Attendance</h2>
+        <h2>Your Attendance</h2>
         <?php if ($attendanceResult->num_rows > 0): ?>
             <table>
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th>Class Name</th>
-                        <th>Status</th>
+                        <th>Hour 1</th>
+                        <th>Hour 2</th>
+                        <th>Hour 3</th>
+                        <th>Hour 4</th>
+                        <th>Hour 5</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($row = $attendanceResult->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($row['date']); ?></td>
-                            <td><?php echo htmlspecialchars($row['className']); ?></td>
-                            <td><?php echo $row['status'] == '1' ? 'Present' : 'Absent'; ?></td>
+                            <td><?php echo htmlspecialchars($row['Att_date']); ?></td>
+                            <td><?php echo $row['att_hr_1'] == 1 ? 'Present' : 'Absent'; ?></td>
+                            <td><?php echo $row['att_hr_2'] == 1 ? 'Present' : 'Absent'; ?></td>
+                            <td><?php echo $row['att_hr_3'] == 1 ? 'Present' : 'Absent'; ?></td>
+                            <td><?php echo $row['att_hr_4'] == 1 ? 'Present' : 'Absent'; ?></td>
+                            <td><?php echo $row['att_hr_5'] == 1 ? 'Present' : 'Absent'; ?></td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
         <?php else: ?>
-            <p>No attendance records found for today.</p>
+            <p>No attendance records found.</p>
         <?php endif; ?>
 
-        <!-- <a href="index.php" class="back-btn">Back to Dashboard</a> -->
+
+
+
+
+
+
+        <!-- <a href="logout.php" class="back-btn">Logout</a> -->
     </div>
 </body>
 

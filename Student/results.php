@@ -20,7 +20,7 @@ $query = "
            es.marks_obtained, es.status
     FROM tblexam_stu es
     INNER JOIN tblexam e ON es.exam_id = e.exam_id
-    WHERE es.student_id = $student_id";
+    WHERE es.std_id = $student_id"; // Ensure you use the correct column for student ID
 
 $result = $conn->query($query);
 ?>
@@ -33,7 +33,6 @@ $result = $conn->query($query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Results</title>
     <style>
-        /* Matching CSS */
         body {
             font-family: Arial, sans-serif;
             background-color: #a9c2f9;
@@ -131,8 +130,8 @@ $result = $conn->query($query);
                             <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
                             <td><?php echo htmlspecialchars($row['maximum_marks']); ?></td>
                             <td><?php echo htmlspecialchars($row['marks_obtained']); ?></td>
-                            <td class="<?php echo $row['status'] ? 'status-pass' : 'status-fail'; ?>">
-                                <?php echo $row['status'] ? 'Pass' : 'Fail'; ?>
+                            <td class="<?php echo $row['status'] == 1 ? 'status-pass' : 'status-fail'; ?>">
+                                <?php echo $row['status'] == 1 ? 'Pass' : 'Fail'; ?>
                             </td>
                         </tr>
                     <?php endwhile; ?>

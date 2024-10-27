@@ -1,44 +1,17 @@
-<?php
-session_start();
-include('../includes/dbcon.php'); // Adjust path if needed
-
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-// Check if the student is logged in
-if (!isset($_SESSION['userId'])) {
-    die("You need to log in to access this page.");
-}
-
-// Get student’s admission number from the session
-$student_id = $_SESSION['userId'];
-$query = "SELECT admissionNumber FROM tblstudents WHERE Id = $student_id";
-$result = $conn->query($query);
-$admissionNo = $result->fetch_assoc()['admissionNumber'];
-?>
-
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f4fa;
-        margin: 0;
-        padding: 0;
-    }
-
     .container {
         max-width: 800px;
-        margin: 50px auto;
-        background-color: #fff;
-        padding: 30px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
     }
 
     h2 {
         text-align: center;
         margin-bottom: 20px;
-        color: #333;
+        color: #4a90e2;
     }
 
     .form-group {
@@ -46,64 +19,81 @@ $admissionNo = $result->fetch_assoc()['admissionNumber'];
     }
 
     label {
-        font-weight: bold;
         display: block;
         margin-bottom: 5px;
+        font-weight: bold;
     }
 
-    input,
-    select {
+    select,
+    input[type="date"],
+    input[type="month"],
+    button {
         width: 100%;
         padding: 10px;
-        margin-top: 5px;
-        border: 1px solid #ddd;
+        border: 1px solid #ccc;
         border-radius: 5px;
+        font-size: 16px;
+        margin-top: 5px;
     }
 
-    table {
+    button {
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #357ab8;
+    }
+
+    #attendanceTable {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
     }
 
-    table,
-    th,
-    td {
+    #attendanceTable th,
+    #attendanceTable td {
         border: 1px solid #ddd;
-    }
-
-    th,
-    td {
         padding: 10px;
         text-align: center;
     }
 
-    th {
-        background-color: #5752e3;
-        color: white;
+    #attendanceTable th {
+        background-color: #f1f1f1;
     }
 
     .status-present {
-        background-color: #4caf50;
-        color: white;
+        background-color: #d4edda;
+        /* Light green background */
+        color: #155724;
+        /* Dark green text */
+        font-weight: bold;
+        padding: 5px;
+        border-radius: 5px;
     }
 
     .status-absent {
-        background-color: #f44336;
-        color: white;
+        background-color: #f8d7da;
+        /* Light red background */
+        color: #721c24;
+        /* Dark red text */
+        font-weight: bold;
+        padding: 5px;
+        border-radius: 5px;
     }
 
-    .btn {
-        background-color: #5752e3;
-        color: white;
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-        width: 100%;
-    }
+    @media (max-width: 600px) {
+        button {
+            font-size: 14px;
+        }
 
-    .btn:hover {
-        background-color: #534edc;
+        #attendanceTable th,
+        #attendanceTable td {
+            font-size: 14px;
+        }
     }
 </style>
 
@@ -136,10 +126,11 @@ $admissionNo = $result->fetch_assoc()['admissionNumber'];
                 <tr>
                     <th>#</th>
                     <th>Date</th>
-                    <th>Class</th>
-                    <th>Class Arm</th>
-                    <th>Session</th>
-                    <th>Term</th>
+                    <th>Hour 1</th>
+                    <th>Hour 2</th>
+                    <th>Hour 3</th>
+                    <th>Hour 4</th>
+                    <th>Hour 5</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -153,7 +144,6 @@ $admissionNo = $result->fetch_assoc()['admissionNumber'];
     const datePicker = document.getElementById('datePicker');
     const monthPicker = document.getElementById('monthPicker');
 
-    // Toggle between day picker and month picker
     viewTypeSelect.addEventListener('change', function() {
         if (this.value === 'day') {
             datePicker.style.display = 'block';
@@ -164,7 +154,6 @@ $admissionNo = $result->fetch_assoc()['admissionNumber'];
         }
     });
 
-    // Handle form submission
     document.getElementById('viewAttendance').addEventListener('click', function() {
         const viewType = viewTypeSelect.value;
         let dateInput;
@@ -172,8 +161,7 @@ $admissionNo = $result->fetch_assoc()['admissionNumber'];
         if (viewType === 'day') {
             dateInput = document.getElementById('attendanceDate').value;
         } else {
-            // For month view, we get the month and set the day to 01
-            dateInput = document.getElementById('attendanceMonth').value + '-01'; // Adding '-01' for the first day of the month
+            dateInput = document.getElementById('attendanceMonth').value + '-01';
         }
 
         if (!dateInput) {
@@ -189,15 +177,10 @@ $admissionNo = $result->fetch_assoc()['admissionNumber'];
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 const tableBody = document.querySelector('#attendanceTable tbody');
-                tableBody.innerHTML = ''; // Clear previous data
+                tableBody.innerHTML = '';
 
                 if (data.length > 0) {
                     data.forEach((record, index) => {
@@ -205,19 +188,20 @@ $admissionNo = $result->fetch_assoc()['admissionNumber'];
                         const statusClass = record.status === 'Present' ? 'status-present' : 'status-absent';
 
                         row.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${record.date}</td>
-                            <td>${record.className}</td>
-                            <td>${record.classArmName}</td>
-                            <td>${record.sessionName}</td>
-                            <td>${record.termName}</td>
-                            <td class="${statusClass}">${record.status}</td>
-                        `;
+                                <td>${index + 1}</td>
+                                <td>${record.date}</td>
+                                <td class="${record.att_hr_1 === 1 ? 'status-present' : 'status-absent'}">${record.att_hr_1 === 1 ? 'Present' : 'Absent'}</td>
+                                <td class="${record.att_hr_2 === 1 ? 'status-present' : 'status-absent'}">${record.att_hr_2 === 1 ? 'Present' : 'Absent'}</td>
+                                <td class="${record.att_hr_3 === 1 ? 'status-present' : 'status-absent'}">${record.att_hr_3 === 1 ? 'Present' : 'Absent'}</td>
+                                <td class="${record.att_hr_4 === 1 ? 'status-present' : 'status-absent'}">${record.att_hr_4 === 1 ? 'Present' : 'Absent'}</td>
+                                <td class="${record.att_hr_5 === 1 ? 'status-present' : 'status-absent'}">${record.att_hr_5 === 1 ? 'Present' : 'Absent'}</td>
+                                <td class="${statusClass}">${record.status}</td>
+                            `;
                         tableBody.appendChild(row);
                     });
                     document.getElementById('attendanceTableContainer').style.display = 'block';
                 } else {
-                    tableBody.innerHTML = `<tr><td colspan="7">No records found.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="8">No records found.</td></tr>`;
                 }
             })
             .catch(error => {
