@@ -24,6 +24,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 event.preventDefault(); // Prevent the default link behavior
                 const page = this.getAttribute('data-page');
                 loadPage(page);
+                if(page!='AddAttendance.php' && page!='ViewAttendance.php' ){
+                    document.getElementById('att-subdata').classList.remove('active');
+                }
+                if(page!='AddResuts.php' && page!='ViewResuts.php'  && page!='AddExams.php'){
+                    document.getElementById('res-subdata').classList.remove('active');
+                }
                 window.history.pushState(null, '', `?page=${page}`); // Update the URL without reloading the page
             } else {
                 // Allow the logout option to proceed with the default link behavior
@@ -71,5 +77,15 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+function subdataToggle(ObjectName){
+    object=document.getElementById(ObjectName)
+    if(object.classList.contains('active')){
+        object.classList.remove('active')
+    }else{
+        object.classList.add('active')
+    }
+}
+
 
 

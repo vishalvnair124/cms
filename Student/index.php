@@ -9,7 +9,10 @@ include 'session_check.php';
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student</title>
+    <link href="../img/logo/attnlg.jpg" rel="icon">
+    <title>CMS
+
+    </title>
     <link rel="stylesheet" href="./homestyles/newstyle.css">
     <link rel="stylesheet" href="./homestyles/responsive.css">
     <script src="script.js"></script> <!-- jQuery for easier AJAX handling -->
@@ -20,7 +23,7 @@ include 'session_check.php';
     <!-- Header -->
     <header>
         <div class="logosec">
-            <div class="logo">SMS🧑‍🎓</div>
+            <div class="logo">CMS🧑‍🎓</div>
             <img src="../media/icon-menu.png" class="icn menuicn" id="menuicn" alt="menu-icon">
         </div>
     </header>
