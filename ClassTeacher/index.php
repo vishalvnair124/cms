@@ -1,5 +1,5 @@
 <?php
-// include 'session_check.php';
+include 'session_check.php';
 ?>
 
 <!DOCTYPE html>
@@ -37,10 +37,11 @@
                         <img src="../media/dashboard.png" class="nav-img" alt="dashboard">
                         <h3>Dashboard</h3>
                     </a>
-                    <a href="?page=profile.php" class="nav-option no-a" data-page="profile.php">
+                    <a href="?page=students.php" class="nav-option no-a" data-page="students.php">
                         <img src="../media/profile_icon.png" class="nav-img" alt="profile">
                         <h3>Students</h3>
                     </a>
+
                     <div>
                         <a href="" class="nav-option no-a" onclick="subdataToggle('att-subdata')">
                             <img src="../media/attendanc_icon.png" class="nav-img" alt="results">

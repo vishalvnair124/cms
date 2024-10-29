@@ -1,18 +1,29 @@
 <?php
-session_start();
-
-// Unset all of the session variables
-$_SESSION = array();
-
-// If session cookies are used, delete the session cookie
-if (ini_get("session.use_cookies")) {
-    $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
+// Start the session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
+
+// Unset all session variables
+$_SESSION = [];
 
 // Destroy the session
 session_destroy();
 
-// Redirect to the login page
+// Optional: Delete the session cookie (for better security)
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(
+        session_name(),
+        '',
+        time() - 42000, // Expire in the past
+        $params["path"],
+        $params["domain"],
+        $params["secure"],
+        $params["httponly"]
+    );
+}
+
+// Redirect to the login page or index
 header("Location: ../index.php");
-exit(); // Ensure no further code is executed after redirect
+exit();

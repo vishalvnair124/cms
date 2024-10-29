@@ -202,7 +202,7 @@ header {
 }
 
 .navclose {
-    width: 80px;
+    width: 70px;
 }
 
 .nav-option {
@@ -377,12 +377,15 @@ tr:nth-child(odd) {
 /* Other existing styles */
 
 
-#att-subdata,#res-subdata{
+#att-subdata,
+#res-subdata {
     margin-left: 10px;
     font-size: 12px;
     height: 0px;
     overflow: hidden;
 }
-#att-subdata.active,#res-subdata.active{
+
+#att-subdata.active,
+#res-subdata.active {
     height: fit-content;
 }

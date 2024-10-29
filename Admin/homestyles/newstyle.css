@@ -202,7 +202,7 @@ header {
 }
 
 .navclose {
-    width: 80px;
+    width: 70px;
 }
 
 .nav-option {
@@ -229,7 +229,7 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
+    gap: 10px;
 }
 
 
@@ -375,3 +375,17 @@ tr:nth-child(odd) {
 }
 
 /* Other existing styles */
+
+
+#att-subdata,
+#res-subdata {
+    margin-left: 10px;
+    font-size: 12px;
+    height: 0px;
+    overflow: hidden;
+}
+
+#att-subdata.active,
+#res-subdata.active {
+    height: fit-content;
+}
