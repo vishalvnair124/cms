@@ -37,59 +37,22 @@ include 'session_check.php';
                         <img src="../media/dashboard.png" class="nav-img" alt="dashboard">
                         <h3>Dashboard</h3>
                     </a>
-                    <a href="?page=profile.php" class="nav-option no-a" data-page="profile.php">
-                        <img src="../media/profile_icon.png" class="nav-img" alt="profile">
-                        <h3>Teacher</h3>
+                    <a href="?page=teachers.php" class="nav-option no-a" data-page="teachers.php">
+                        <img src="../media/teacher_icon.png" class="nav-img" alt="profile">
+                        <h3>Teachers</h3>
                     </a>
                     <a href="?page=students.php" class="nav-option no-a" data-page="students.php">
                         <img src="../media/profile_icon.png" class="nav-img" alt="profile">
                         <h3>Students</h3>
                     </a>
-                    <a href="?page=students.php" class="nav-option no-a" data-page="students.php">
-                        <img src="../media/profile_icon.png" class="nav-img" alt="profile">
+                    <a href="?page=courses.php" class="nav-option no-a" data-page="courses.php">
+                        <img src="../media/courses_icon.png" class="nav-img" alt="profile">
                         <h3>Courses</h3>
                     </a>
                     <a href="?page=notification.php" class="nav-option no-a" data-page="notification.php">
-                        <img src="../media/profile_icon.png" class="nav-img" alt="profile">
+                        <img src="../media/notification_icon.png" class="nav-img" alt="profile">
                         <h3>Notification</h3>
                     </a>
-                    <div>
-                        <a href="" class="nav-option no-a" onclick="subdataToggle('att-subdata')">
-                            <img src="../media/attendanc_icon.png" class="nav-img" alt="results">
-                            <h3>Attendance</h3>
-
-                        </a>
-                        <div id='att-subdata'>
-                            <a href="?page=AddAttendance.php" class="nav-option no-a" data-page="AddAttendance.php">
-                                <img src="../media/results_icon.png" class="nav-img" alt="results">
-                                <h3>Add Attendance</h3>
-                            </a>
-                            <a href="?page=ViewAttendance.php" class="nav-option no-a" data-page="ViewAttendance.php">
-                                <img src="../media/results_icon.png" class="nav-img" alt="results">
-                                <h3>View Attendance</h3>
-                            </a>
-                        </div>
-                    </div>
-                    <div>
-                        <a href="" class="nav-option no-a" onclick="subdataToggle('res-subdata')">
-                            <img src="../media/results_icon.png" class="nav-img" alt="results">
-                            <h3>Exam</h3>
-                        </a>
-                        <div id='res-subdata'>
-                            <a href="?page=AddExams.php" class="nav-option no-a" data-page="AddExams.php">
-                                <img src="../media/results_icon.png" class="nav-img" alt="results">
-                                <h3>Add Exams</h3>
-                            </a>
-                            <a href="?page=AddResuts.php" class="nav-option no-a" data-page="AddResuts.php">
-                                <img src="../media/results_icon.png" class="nav-img" alt="results">
-                                <h3>Add Resuts</h3>
-                            </a>
-                            <a href="?page=ViewResuts.php" class="nav-option no-a" data-page="ViewResuts.php">
-                                <img src="../media/results_icon.png" class="nav-img" alt="results">
-                                <h3>View Resuts</h3>
-                            </a>
-                        </div>
-                    </div>
 
 
                     <a href="logout.php" class="no-a">
