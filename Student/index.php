@@ -1,5 +1,8 @@
 <?php
 include 'session_check.php';
+
+include 'student_checkup.php';
+
 ?>
 
 <!DOCTYPE html>
