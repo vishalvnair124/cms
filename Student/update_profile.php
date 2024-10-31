@@ -32,7 +32,33 @@ try {
     // Begin transaction
     $conn->begin_transaction();
 
-    // Update student details (address is optional)
+    // Check if the email is already taken by another student
+    $emailCheckQuery = "SELECT std_id FROM tblstudents WHERE std_email = ? AND std_id != ?";
+    $emailStmt = $conn->prepare($emailCheckQuery);
+    $emailStmt->bind_param("si", $std_email, $student_id);
+    $emailStmt->execute();
+    $emailStmt->store_result();
+
+    if ($emailStmt->num_rows > 0) {
+        echo json_encode(['status' => 'error', 'message' => 'This email is already registered with another student.']);
+        $conn->rollback();
+        exit;
+    }
+
+    // Check if the phone number is already taken by another student
+    $phoneCheckQuery = "SELECT std_id FROM tblstudents WHERE std_phone_number = ? AND std_id != ?";
+    $phoneStmt = $conn->prepare($phoneCheckQuery);
+    $phoneStmt->bind_param("si", $std_phone_number, $student_id);
+    $phoneStmt->execute();
+    $phoneStmt->store_result();
+
+    if ($phoneStmt->num_rows > 0) {
+        echo json_encode(['status' => 'error', 'message' => 'This phone number is already registered with another student.']);
+        $conn->rollback();
+        exit;
+    }
+
+    // Proceed with updating student details (address is optional)
     $updateQuery = "UPDATE tblstudents 
                     SET std_email = ?, std_phone_number = ?, std_parent_ph = ?, std_address = ? 
                     WHERE std_id = ?";
@@ -66,5 +92,7 @@ try {
     echo json_encode(['status' => 'error', 'message' => 'Failed to update profile. ' . $e->getMessage()]);
 } finally {
     $stmt->close();
+    $emailStmt->close();
+    $phoneStmt->close();
     $conn->close();
 }

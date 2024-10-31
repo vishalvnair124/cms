@@ -20,6 +20,7 @@ session_start();
 </head>
 
 <body class="bg-gradient-login">
+    <div> <a href="./one_time.php"><Button></Button></a></div>
     <div class="container-login">
         <div class="row justify-content-center">
             <div class="col-xl-10 col-lg-12 col-md-9">
