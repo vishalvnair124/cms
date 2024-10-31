@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 27, 2024 at 05:50 AM
+-- Generation Time: Oct 31, 2024 at 02:33 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,7 +64,16 @@ CREATE TABLE `tblattendance` (
 --
 
 INSERT INTO `tblattendance` (`Att_id`, `Att_date`, `std_id`, `att_hr_1`, `att_hr_2`, `att_hr_3`, `att_hr_4`, `att_hr_5`) VALUES
-(1, '2024-10-27', 1, 1, 1, 1, 0, 1);
+(2, '2024-10-19', 1, 1, 1, 1, 1, 1),
+(3, '2024-10-20', 1, 1, 1, 1, 1, 1),
+(4, '2024-10-21', 1, 1, 1, 1, 1, 1),
+(5, '2024-10-22', 1, 1, 1, 1, 1, 1),
+(6, '2024-10-23', 1, 1, 1, 1, 1, 1),
+(7, '2024-10-24', 1, 1, 1, 1, 1, 1),
+(8, '2024-10-25', 1, 1, 1, 1, 1, 1),
+(9, '2024-10-26', 1, 1, 1, 1, 1, 1),
+(10, '2024-10-27', 1, 1, 1, 1, 1, 1),
+(11, '2024-10-28', 1, 1, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -83,7 +92,8 @@ CREATE TABLE `tblcourse` (
 --
 
 INSERT INTO `tblcourse` (`course_id`, `course_name`, `course_start`) VALUES
-(1, 'Computer Science', '2024');
+(1, 'BCA', '2024'),
+(2, 'BBA', '2024');
 
 -- --------------------------------------------------------
 
@@ -102,7 +112,30 @@ CREATE TABLE `tblcourseincharge` (
 --
 
 INSERT INTO `tblcourseincharge` (`course_id`, `tea_id`, `isActive`) VALUES
-(1, 1, 1);
+(1, 1, 1),
+(2, 3, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcoursetaken`
+--
+
+CREATE TABLE `tblcoursetaken` (
+  `course_taken_id` int(11) NOT NULL,
+  `std_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `isActive` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcoursetaken`
+--
+
+INSERT INTO `tblcoursetaken` (`course_taken_id`, `std_id`, `course_id`, `isActive`) VALUES
+(1, 1, 2, 0),
+(2, 1, 1, 1),
+(3, 2, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -120,13 +153,6 @@ CREATE TABLE `tblexam` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tblexam`
---
-
-INSERT INTO `tblexam` (`exam_id`, `subject_name`, `subject_code`, `exam_date`, `maximum_marks`, `course_id`, `created_at`) VALUES
-(1, 'Mathematics', 'MATH101', '2024-12-01', 100, 1, '2024-10-27 03:35:39');
-
 -- --------------------------------------------------------
 
 --
@@ -141,13 +167,6 @@ CREATE TABLE `tblexam_stu` (
   `status` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tblexam_stu`
---
-
-INSERT INTO `tblexam_stu` (`tblexam_stu_id`, `exam_id`, `std_id`, `marks_obtained`, `status`) VALUES
-(1, 1, 1, 85, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -156,8 +175,23 @@ INSERT INTO `tblexam_stu` (`tblexam_stu_id`, `exam_id`, `std_id`, `marks_obtaine
 
 CREATE TABLE `tblnotification` (
   `notification_id` int(11) NOT NULL,
-  `notification_text` text NOT NULL
+  `notification_text` text NOT NULL,
+  `notification_status` int(11) NOT NULL,
+  `notification_title` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblnotification`
+--
+
+INSERT INTO `tblnotification` (`notification_id`, `notification_text`, `notification_status`, `notification_title`) VALUES
+(1, 'We are excited to welcome you to the new academic year! Make sure to check your schedules and course materials.', 1, 'Welcome to the New Academic '),
+(2, 'The schedule for the upcoming midterm exams has been released. Please check the student portal for details.', 1, 'Midterm Exam Schedule'),
+(3, 'Please remember that attendance is mandatory for all classes. Make sure to log in during your scheduled sessions.', 1, 'Attendance Policy Reminder'),
+(4, 'Join us for a workshop on career development this Friday at 2 PM in the main auditorium. All students are encouraged to attend.', 1, 'Workshop on Career Development'),
+(5, 'Classes will be suspended for the holiday break from December 20th to January 2nd. Enjoy your holidays!', 1, 'Holiday Break Announcement'),
+(8, 'sample Text ,sample text', 1, 'Sample Title'),
+(9, 'sample Text ,sample text 1', 1, 'Sample Title');
 
 -- --------------------------------------------------------
 
@@ -177,15 +211,19 @@ CREATE TABLE `tblstudents` (
   `std_phone_number` varchar(20) NOT NULL DEFAULT '0000000000',
   `stud_dob` date DEFAULT NULL,
   `std_address` text NOT NULL,
-  `stud_aadhar_no` int(11) NOT NULL
+  `std_aadhar_no` int(14) NOT NULL,
+  `std_parent_name` varchar(30) NOT NULL,
+  `std_parent_ph` int(12) NOT NULL,
+  `std_status` int(11) NOT NULL DEFAULT 2
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblstudents`
 --
 
-INSERT INTO `tblstudents` (`std_id`, `std_firstName`, `std_lastName`, `std_otherName`, `std_admissionNumber`, `std_password`, `std_dateCreated`, `std_email`, `std_phone_number`, `stud_dob`, `std_address`, `stud_aadhar_no`) VALUES
-(1, 'Alice', 'Smith', NULL, 'ADM12345', '827ccb0eea8a706c4c34a16891f84e7b', '2024-10-27', 'alice@example.com', '9876543211', NULL, '456 Elm St', 2147483647);
+INSERT INTO `tblstudents` (`std_id`, `std_firstName`, `std_lastName`, `std_otherName`, `std_admissionNumber`, `std_password`, `std_dateCreated`, `std_email`, `std_phone_number`, `stud_dob`, `std_address`, `std_aadhar_no`, `std_parent_name`, `std_parent_ph`, `std_status`) VALUES
+(1, 'Alice', 'Smith', NULL, 'ADM12345', '827ccb0eea8a706c4c34a16891f84e7b', '2024-10-27', 'vishalvnair124@gmail.com', '09526212285', NULL, 'Saraswathy vilasam mancode po ,kalanjoor', 2147483647, '', 2147483647, 1),
+(2, 'VISHAL', 'NAIR', '', 'ADM2', '827ccb0eea8a706c4c34a16891f84e7b', '2024-10-31 15:36:40', 'vishalvnair0124@gmail.com', '9539109602', '2003-10-25', 'Saraswathy vilasam mancode po ,kalanjoor', 2147483647, 'B VIKRAMAN', 2147483647, 1);
 
 -- --------------------------------------------------------
 
@@ -210,11 +248,9 @@ CREATE TABLE `tblteachers` (
 --
 
 INSERT INTO `tblteachers` (`tea_id`, `tea_firstName`, `tea_lastName`, `tea_emailAddress`, `tea_password`, `tea_phoneNo`, `tea_dateCreated`, `tea_address`, `tea_is_assigned`) VALUES
-(1, 'John', 'Doe', 'johndoe@example.com', '827ccb0eea8a706c4c34a16891f84e7b', '9876543210', '2024-10-27', '123 Main St', 0),
-(3, 'Will', 'Kibagendi', 'teacher2@mail.com', '827ccb0eea8a706c4c34a16891f84e7b', '09089898999', '2022-10-31', 'Nairobi, Kenya', 0),
-(4, 'Demola', 'Ade', 'teacher3@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', '09672002882', '2022-11-01', 'Lagos, Nigeria', 0),
-(5, 'Ryan', 'Mbeche', 'teacher4@mail.com', '827ccb0eea8a706c4c34a16891f84e7b', '7014560000', '2022-10-07', 'Kisumu, Kenya', 0),
-(6, 'John', 'Keroche', 'teacher@mail.com', '827ccb0eea8a706c4c34a16891f84e7b', '0100000030', '2022-10-07', 'Nakuru, Kenya', 0);
+(1, 'John', 'Doe', 'teacher@example.com', '827ccb0eea8a706c4c34a16891f84e7b', '9876543210', '2024-10-27', '123 Main St', 1),
+(3, 'Will', 'Kibagendi', 'teacher2@mail.com', '827ccb0eea8a706c4c34a16891f84e7b', '09089898999', '2022-10-31', 'Nairobi, Kenya', 1),
+(15, 'VISHAL', 'NAIR', 'vishalvnair124@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', '09526212285', '2024-10-30 16:17:03', 'Saraswathy vilasam mancode po ,kalanjoor', 0);
 
 --
 -- Indexes for dumped tables
@@ -243,8 +279,15 @@ ALTER TABLE `tblcourse`
 -- Indexes for table `tblcourseincharge`
 --
 ALTER TABLE `tblcourseincharge`
-  ADD PRIMARY KEY (`course_id`,`tea_id`),
-  ADD KEY `tea_id` (`tea_id`);
+  ADD PRIMARY KEY (`course_id`);
+
+--
+-- Indexes for table `tblcoursetaken`
+--
+ALTER TABLE `tblcoursetaken`
+  ADD PRIMARY KEY (`course_taken_id`),
+  ADD KEY `std_id` (`std_id`),
+  ADD KEY `course_id` (`course_id`);
 
 --
 -- Indexes for table `tblexam`
@@ -271,7 +314,8 @@ ALTER TABLE `tblnotification`
 -- Indexes for table `tblstudents`
 --
 ALTER TABLE `tblstudents`
-  ADD PRIMARY KEY (`std_id`);
+  ADD PRIMARY KEY (`std_id`),
+  ADD UNIQUE KEY `std_admissionNumber` (`std_admissionNumber`);
 
 --
 -- Indexes for table `tblteachers`
@@ -293,13 +337,25 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblattendance`
 --
 ALTER TABLE `tblattendance`
-  MODIFY `Att_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Att_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tblcourse`
 --
 ALTER TABLE `tblcourse`
-  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tblcourseincharge`
+--
+ALTER TABLE `tblcourseincharge`
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tblcoursetaken`
+--
+ALTER TABLE `tblcoursetaken`
+  MODIFY `course_taken_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblexam`
@@ -317,19 +373,19 @@ ALTER TABLE `tblexam_stu`
 -- AUTO_INCREMENT for table `tblnotification`
 --
 ALTER TABLE `tblnotification`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tblstudents`
 --
 ALTER TABLE `tblstudents`
-  MODIFY `std_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `std_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tblteachers`
 --
 ALTER TABLE `tblteachers`
-  MODIFY `tea_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `tea_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Constraints for dumped tables
@@ -342,11 +398,11 @@ ALTER TABLE `tblattendance`
   ADD CONSTRAINT `FK_std_id` FOREIGN KEY (`std_id`) REFERENCES `tblstudents` (`std_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `tblcourseincharge`
+-- Constraints for table `tblcoursetaken`
 --
-ALTER TABLE `tblcourseincharge`
-  ADD CONSTRAINT `tblcourseincharge_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `tblcourse` (`course_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `tblcourseincharge_ibfk_2` FOREIGN KEY (`tea_id`) REFERENCES `tblteachers` (`tea_id`) ON DELETE CASCADE;
+ALTER TABLE `tblcoursetaken`
+  ADD CONSTRAINT `tblcoursetaken_ibfk_1` FOREIGN KEY (`std_id`) REFERENCES `tblstudents` (`std_id`),
+  ADD CONSTRAINT `tblcoursetaken_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `tblcourse` (`course_id`);
 
 --
 -- Constraints for table `tblexam`
