@@ -11,16 +11,13 @@ session_start();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="img/logo/attnlg.jpg" rel="icon">
-    <title>CMS
-
-    </title>
+    <title>CMS</title>
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="css/ruang-admin.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-gradient-login">
-    <div> <a href="./one_time.php"><Button></Button></a></div>
     <div class="container-login">
         <div class="row justify-content-center">
             <div class="col-xl-10 col-lg-12 col-md-9">
@@ -77,18 +74,10 @@ session_start();
                                             $redirect = 'Student/index.php';
                                         }
 
-
                                         if (isset($query)) {
                                             // Prepare the SQL statement
                                             $stmt = $conn->prepare($query);
-
-                                            // Bind parameters based on role
-                                            if ($role == 'student') {
-                                                $stmt->bind_param("ss", $username, $password);
-                                            } else {
-                                                $stmt->bind_param("ss", $username, $password);
-                                            }
-
+                                            $stmt->bind_param("ss", $username, $password);
                                             $stmt->execute();
                                             $result = $stmt->get_result();
 
@@ -129,6 +118,10 @@ session_start();
                                     <hr>
                                     <div class="text-center">
                                         <a class="font-weight-bold small" href="forgotPassword.php">Forgot Password?</a>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <!-- One-Time Registration Link -->
+                                        <a href="./one_time.php" class="btn btn-secondary">One-Time Registration</a>
                                     </div>
                                 </div>
                             </div>
