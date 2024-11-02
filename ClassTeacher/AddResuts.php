@@ -22,7 +22,7 @@ $classTeacherCheckQuery = "SELECT tea_id FROM tblcourseincharge WHERE tea_id = $
 $classTeacherCheckResult = $conn->query($classTeacherCheckQuery);
 
 if ($classTeacherCheckResult->num_rows === 0) {
-    die("<div class='alert alert-danger'><h1>You are not assigned as a class teacher!</h1></div>");
+    die("<div class='alert alert-danger'><h1>Access denied. You are not an active course incharge.</h1></div>");
 }
 
 // Fetch the course information associated with the teacher from tblcourseincharge

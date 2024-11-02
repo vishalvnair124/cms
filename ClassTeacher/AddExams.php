@@ -242,7 +242,7 @@ if ($result->num_rows > 0) {
                 <?php endif; ?>
             </div>
         <?php else: ?>
-            <div class='alert'>You are not assigned as a class teacher for any course.</div>
+            <div class='alert'>Access denied. You are not an active course incharge.</div>
         <?php endif; ?>
     </div>
 

@@ -1,3 +1,50 @@
+<?php
+session_start();
+include '../Includes/dbcon.php';
+
+if (!isset($_SESSION['userId'])) {
+    die("Unauthorized access! Please log in.");
+}
+
+$teacherId = $_SESSION['userId'];
+
+// Check if the user is an active course incharge
+$checkCourseInchargeQuery = "SELECT COUNT(*) AS count
+                             FROM tblcourseincharge c
+                             INNER JOIN tblcourse cr ON c.course_id = cr.course_id 
+                             WHERE c.tea_id = ? AND c.isActive = 1";
+$stmt = $conn->prepare($checkCourseInchargeQuery);
+
+if (!$stmt) {
+    die("Database error: " . $conn->error);
+}
+
+$stmt->bind_param("i", $teacherId);
+$stmt->execute();
+$stmt->bind_result($count);
+$stmt->fetch();
+$stmt->close();
+
+if ($count == 0) {
+    die("<h1>Access denied. You are not an active course incharge.</h1>");
+}
+
+// Query to fetch exams for which the user is the course incharge
+$examQuery = "SELECT e.exam_id, e.subject_name, e.Qp_code 
+              FROM tblexam e
+              INNER JOIN tblcourseincharge c ON e.course_id = c.course_id 
+              WHERE c.tea_id = ?";
+$stmt = $conn->prepare($examQuery);
+
+if (!$stmt) {
+    die("Database error: " . $conn->error);
+}
+
+$stmt->bind_param("i", $teacherId);
+$stmt->execute();
+$exams = $stmt->get_result();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,21 +53,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="../img/logo/attnlg.jpg" rel="icon">
     <title>View Class Results</title>
+
+
     <style>
-        /* Add your styles here */
         .container {
             max-width: 900px;
             background-color: #fff;
             padding: 2em;
             margin: 50px auto;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             border-radius: 8px;
         }
 
-        h1,
-        h2 {
+        h1 {
             text-align: center;
             color: #5752e3;
+            margin-bottom: 1em;
         }
 
         .form-group {
@@ -39,7 +87,6 @@
             padding: 0.8em;
             border: 1px solid #ddd;
             border-radius: 5px;
-            outline: none;
             font-size: 1em;
             transition: border-color 0.3s;
         }
@@ -56,7 +103,6 @@
             border-radius: 5px;
             font-size: 1em;
             cursor: pointer;
-            display: inline-block;
             transition: background-color 0.3s;
         }
 
@@ -71,18 +117,41 @@
         .result-list table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 1em;
         }
 
         .result-list th,
         .result-list td {
-            border: 1px solid #000;
-            padding: 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
             text-align: left;
         }
 
         .result-list th {
             background-color: #5752e3;
             color: #fff;
+        }
+
+        .result-list tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .result-list tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .status-present {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-absent {
+            color: red;
+            font-weight: bold;
+        }
+
+        h2 {
+            color: #5752e3;
         }
     </style>
     <script>
@@ -100,17 +169,21 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        let resultHTML = '<h2>Results</h2><table><thead><tr><th>Student Name</th><th>Marks Obtained</th><th>Status</th></tr></thead><tbody>';
+                        let resultHTML = '<h2>Results</h2><table><thead><tr><th>Admission Number</th><th>Student Name</th><th>Marks Obtained</th><th>Status</th></tr></thead><tbody>';
                         if (data.length > 0) {
                             data.forEach(result => {
+                                const statusText = result.status == 1 ? "Present" : "Absent";
+                                const statusClass = result.status == 1 ? "status-present" : "status-absent";
+
                                 resultHTML += `<tr>
+                                               <td>${result.std_admissionNumber}</td>
                                                <td>${result.std_firstName} ${result.std_lastName}</td>
                                                <td>${result.marks_obtained}</td>
-                                               <td>${result.status}</td>
+                                               <td class="${statusClass}">${statusText}</td>
                                            </tr>`;
                             });
                         } else {
-                            resultHTML += '<tr><td colspan="3">No results found.</td></tr>';
+                            resultHTML += '<tr><td colspan="4">No results found.</td></tr>';
                         }
                         resultHTML += '</tbody></table>';
                         resultContainer.innerHTML = resultHTML;
@@ -126,7 +199,6 @@
 </head>
 
 <body>
-
     <div class="container">
         <h1>View Class Results</h1>
 
@@ -136,33 +208,17 @@
             <select id="exam_id" class="form-control" onchange="fetchResults()">
                 <option value="">Select an Exam</option>
                 <?php
-                // Include required files to fetch exams
-                include '../Includes/dbcon.php';
-                include '../Includes/session.php';
-
-                // Get the teacher ID from the session
-                $teacherId = $_SESSION['userId'];
-
-                // Fetch available exams for the teacher
-                $examQuery = "SELECT * FROM tblexam WHERE course_id IN (SELECT course_id FROM tblcourseincharge WHERE tea_id = ?)";
-                $stmt = $conn->prepare($examQuery);
-                $stmt->bind_param("i", $teacherId);
-                $stmt->execute();
-                $exams = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-                foreach ($exams as $exam):
+                while ($exam = $exams->fetch_assoc()) {
+                    echo '<option value="' . htmlspecialchars($exam['exam_id']) . '">'
+                        . htmlspecialchars($exam['subject_name'] . ' ' . $exam['Qp_code']) . '</option>';
+                }
                 ?>
-                    <option value="<?php echo htmlspecialchars($exam['exam_id']); ?>">
-                        <?php echo htmlspecialchars($exam['subject_name'] . ' ' . $exam['Qp_code']); ?>
-                    </option>
-                <?php endforeach; ?>
             </select>
         </div>
 
         <!-- Display Results -->
         <div class="result-list" id="resultContainer"></div>
     </div>
-
 </body>
 
 </html>

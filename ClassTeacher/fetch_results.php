@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['exam_id'])) {
     $examId = $_POST['exam_id'];
 
     // Fetch results for the entire class from tblexam_stu
-    $resultsQuery = "SELECT std.std_firstName, std.std_lastName, es.marks_obtained, es.status 
+    $resultsQuery = "SELECT std.std_admissionNumber,std.std_firstName, std.std_lastName, es.marks_obtained, es.status 
                      FROM tblstudents std
                      JOIN tblexam_stu es ON std.std_id = es.std_id
                      WHERE es.exam_id = ?";
