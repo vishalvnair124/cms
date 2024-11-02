@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 31, 2024 at 02:33 PM
+-- Generation Time: Nov 02, 2024 at 07:02 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,6 +50,7 @@ INSERT INTO `tbladmin` (`adm_Id`, `adm_firstName`, `adm_lastName`, `adm_emailAdd
 
 CREATE TABLE `tblattendance` (
   `Att_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
   `Att_date` date NOT NULL,
   `std_id` int(11) NOT NULL,
   `att_hr_1` int(11) NOT NULL DEFAULT 1,
@@ -63,17 +64,31 @@ CREATE TABLE `tblattendance` (
 -- Dumping data for table `tblattendance`
 --
 
-INSERT INTO `tblattendance` (`Att_id`, `Att_date`, `std_id`, `att_hr_1`, `att_hr_2`, `att_hr_3`, `att_hr_4`, `att_hr_5`) VALUES
-(2, '2024-10-19', 1, 1, 1, 1, 1, 1),
-(3, '2024-10-20', 1, 1, 1, 1, 1, 1),
-(4, '2024-10-21', 1, 1, 1, 1, 1, 1),
-(5, '2024-10-22', 1, 1, 1, 1, 1, 1),
-(6, '2024-10-23', 1, 1, 1, 1, 1, 1),
-(7, '2024-10-24', 1, 1, 1, 1, 1, 1),
-(8, '2024-10-25', 1, 1, 1, 1, 1, 1),
-(9, '2024-10-26', 1, 1, 1, 1, 1, 1),
-(10, '2024-10-27', 1, 1, 1, 1, 1, 1),
-(11, '2024-10-28', 1, 1, 1, 1, 1, 1);
+INSERT INTO `tblattendance` (`Att_id`, `course_id`, `Att_date`, `std_id`, `att_hr_1`, `att_hr_2`, `att_hr_3`, `att_hr_4`, `att_hr_5`) VALUES
+(32, 1, '2024-11-02', 1, 1, 0, 0, 1, 1),
+(33, 1, '2024-11-02', 2, 1, 1, 1, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcoteachers`
+--
+
+CREATE TABLE `tblcoteachers` (
+  `cotea_id` int(11) NOT NULL,
+  `tea_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcoteachers`
+--
+
+INSERT INTO `tblcoteachers` (`cotea_id`, `tea_id`, `course_id`) VALUES
+(5, 3, 3),
+(6, 1, 3),
+(7, 3, 2),
+(8, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -93,7 +108,8 @@ CREATE TABLE `tblcourse` (
 
 INSERT INTO `tblcourse` (`course_id`, `course_name`, `course_start`) VALUES
 (1, 'BCA', '2024'),
-(2, 'BBA', '2024');
+(2, 'BBA', '2024'),
+(3, 'BCA 2024', '2024');
 
 -- --------------------------------------------------------
 
@@ -113,7 +129,8 @@ CREATE TABLE `tblcourseincharge` (
 
 INSERT INTO `tblcourseincharge` (`course_id`, `tea_id`, `isActive`) VALUES
 (1, 1, 1),
-(2, 3, 1);
+(2, 3, 1),
+(3, 3, 0);
 
 -- --------------------------------------------------------
 
@@ -147,11 +164,25 @@ CREATE TABLE `tblexam` (
   `exam_id` int(11) NOT NULL,
   `subject_name` varchar(255) NOT NULL,
   `subject_code` varchar(50) NOT NULL,
+  `Qp_code` varchar(100) NOT NULL,
   `exam_date` date NOT NULL,
   `maximum_marks` int(11) NOT NULL,
   `course_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblexam`
+--
+
+INSERT INTO `tblexam` (`exam_id`, `subject_name`, `subject_code`, `Qp_code`, `exam_date`, `maximum_marks`, `course_id`, `created_at`) VALUES
+(1, 'English ', 'EN-01', 'QP-104', '2024-11-04', 100, 1, '2024-11-02 04:59:09'),
+(2, 'Maths', 'MA-01', 'QP-103', '2024-11-05', 100, 1, '2024-11-02 05:07:21'),
+(3, 'English ', 'EN-01', 'QP-105', '2024-11-06', 100, 1, '2024-11-02 05:07:57'),
+(4, 'English ', 'EN-01', 'QP-109', '2024-11-11', 100, 1, '2024-11-02 05:09:17'),
+(5, 'Maths', 'MA-01', 'QP-108', '2024-11-07', 100, 1, '2024-11-02 05:13:13'),
+(6, 'Maths', 'MA-01', 'QP-110', '2024-11-12', 100, 1, '2024-11-02 05:16:52'),
+(7, 'Maths', 'MA-01', 'QP-112', '2024-11-15', 100, 1, '2024-11-02 06:34:35');
 
 -- --------------------------------------------------------
 
@@ -166,6 +197,16 @@ CREATE TABLE `tblexam_stu` (
   `marks_obtained` int(11) DEFAULT NULL,
   `status` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblexam_stu`
+--
+
+INSERT INTO `tblexam_stu` (`tblexam_stu_id`, `exam_id`, `std_id`, `marks_obtained`, `status`) VALUES
+(2, 1, 1, 55, 1),
+(3, 1, 2, 100, 1),
+(4, 2, 1, 0, 0),
+(5, 2, 2, 100, 1);
 
 -- --------------------------------------------------------
 
@@ -248,7 +289,7 @@ CREATE TABLE `tblteachers` (
 --
 
 INSERT INTO `tblteachers` (`tea_id`, `tea_firstName`, `tea_lastName`, `tea_emailAddress`, `tea_password`, `tea_phoneNo`, `tea_dateCreated`, `tea_address`, `tea_is_assigned`) VALUES
-(1, 'John', 'Doe', 'teacher@example.com', '827ccb0eea8a706c4c34a16891f84e7b', '9876543210', '2024-10-27', '123 Main St', 1),
+(1, 'John', 'Doe', 'teacher@mail.com', '827ccb0eea8a706c4c34a16891f84e7b', '9876543210', '2024-10-27', '123 Main St', 1),
 (3, 'Will', 'Kibagendi', 'teacher2@mail.com', '827ccb0eea8a706c4c34a16891f84e7b', '09089898999', '2022-10-31', 'Nairobi, Kenya', 1),
 (15, 'VISHAL', 'NAIR', 'vishalvnair124@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', '09526212285', '2024-10-30 16:17:03', 'Saraswathy vilasam mancode po ,kalanjoor', 0);
 
@@ -268,6 +309,14 @@ ALTER TABLE `tbladmin`
 ALTER TABLE `tblattendance`
   ADD PRIMARY KEY (`Att_id`),
   ADD KEY `FK_std_id` (`std_id`);
+
+--
+-- Indexes for table `tblcoteachers`
+--
+ALTER TABLE `tblcoteachers`
+  ADD PRIMARY KEY (`cotea_id`),
+  ADD KEY `tea_id` (`tea_id`),
+  ADD KEY `course_id` (`course_id`);
 
 --
 -- Indexes for table `tblcourse`
@@ -337,19 +386,25 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblattendance`
 --
 ALTER TABLE `tblattendance`
-  MODIFY `Att_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `Att_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT for table `tblcoteachers`
+--
+ALTER TABLE `tblcoteachers`
+  MODIFY `cotea_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tblcourse`
 --
 ALTER TABLE `tblcourse`
-  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblcourseincharge`
 --
 ALTER TABLE `tblcourseincharge`
-  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblcoursetaken`
@@ -361,13 +416,13 @@ ALTER TABLE `tblcoursetaken`
 -- AUTO_INCREMENT for table `tblexam`
 --
 ALTER TABLE `tblexam`
-  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tblexam_stu`
 --
 ALTER TABLE `tblexam_stu`
-  MODIFY `tblexam_stu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `tblexam_stu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tblnotification`
@@ -398,6 +453,13 @@ ALTER TABLE `tblattendance`
   ADD CONSTRAINT `FK_std_id` FOREIGN KEY (`std_id`) REFERENCES `tblstudents` (`std_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `tblcoteachers`
+--
+ALTER TABLE `tblcoteachers`
+  ADD CONSTRAINT `tblcoteachers_ibfk_1` FOREIGN KEY (`tea_id`) REFERENCES `tblteachers` (`tea_id`),
+  ADD CONSTRAINT `tblcoteachers_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `tblcourse` (`course_id`);
+
+--
 -- Constraints for table `tblcoursetaken`
 --
 ALTER TABLE `tblcoursetaken`
@@ -408,7 +470,7 @@ ALTER TABLE `tblcoursetaken`
 -- Constraints for table `tblexam`
 --
 ALTER TABLE `tblexam`
-  ADD CONSTRAINT `tblexam_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `tblcourse` (`course_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `tblexam_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `tblcourse` (`course_id`);
 
 --
 -- Constraints for table `tblexam_stu`
