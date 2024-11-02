@@ -41,6 +41,10 @@ include 'session_check.php';
                         <img src="../media/teacher_icon.png" class="nav-img" alt="profile">
                         <h3>Teachers</h3>
                     </a>
+                    <a href="?page=coteachers.php" class="nav-option no-a" data-page="coteachers.php">
+                        <img src="../media/teacher_icon.png" class="nav-img" alt="profile">
+                        <h3>Co-Teachers</h3>
+                    </a>
                     <a href="?page=students.php" class="nav-option no-a" data-page="students.php">
                         <img src="../media/profile_icon.png" class="nav-img" alt="profile">
                         <h3>Students</h3>
