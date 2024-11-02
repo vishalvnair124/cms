@@ -81,6 +81,14 @@ while ($row = $course_result->fetch_assoc()) {
 
         #attendanceRecords {
             margin-top: 30px;
+            background-color: white;
+            /* Added background color for outer container */
+            padding: 20px;
+            /* Added padding for better spacing */
+            border-radius: 8px;
+            /* Rounded corners */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            /* Shadow for depth */
         }
 
         table {
@@ -144,6 +152,13 @@ while ($row = $course_result->fetch_assoc()) {
             margin: 0;
             font-size: 1.5em;
         }
+
+        .default-message {
+            text-align: center;
+            color: #6c757d;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -169,7 +184,9 @@ while ($row = $course_result->fetch_assoc()) {
             <button type="submit">View Attendance</button>
         </form>
 
-        <div id="attendanceRecords"></div>
+        <div id="attendanceRecords">
+            <div class="default-message">Please select a course and date to view attendance records.</div>
+        </div>
 
         <script>
             $(document).ready(function() {
@@ -192,6 +209,7 @@ while ($row = $course_result->fetch_assoc()) {
 
                 function displayAttendanceRecords(data) {
                     let html = '';
+                    $('#attendanceRecords .default-message').hide(); // Hide default message when fetching data
 
                     if (data.length > 0) {
                         html += '<table>';

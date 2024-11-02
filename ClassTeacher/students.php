@@ -73,8 +73,8 @@ $studentsResult = $studentsStmt->get_result();
         }
 
         th {
-            background-color: #fff;
-            color: #444;
+            background-color: #5752e3;
+            color: #000
         }
 
         tr:hover {
