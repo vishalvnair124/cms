@@ -77,7 +77,9 @@ if (!empty($course_id) && !empty($att_date)) {
     $response['message'] = "Invalid course ID or attendance date.";
 }
 
-// Return a JSON response
-header('Content-Type: application/json');
-echo json_encode($response);
+// Output JavaScript for alert and redirect
+echo "<script>
+        alert('" . addslashes($response['message']) . "'); 
+        window.location.href = 'http://localhost/cms/ClassTeacher/index.php?page=ViewAttendance.php';
+      </script>";
 exit();

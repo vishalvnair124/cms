@@ -24,6 +24,12 @@ $course_result = $course_query->get_result();
 while ($row = $course_result->fetch_assoc()) {
     $courses[] = $row;
 }
+
+// Check if there are courses assigned to the teacher
+if (empty($courses)) {
+    echo "<h2>You do not have any courses assigned. Please contact your administrator.</h2>";
+    exit; // Stop further execution if no courses
+}
 ?>
 
 <!DOCTYPE html>
@@ -114,7 +120,7 @@ while ($row = $course_result->fetch_assoc()) {
 
         <button type="submit">Load Students</button>
     </form>
-
+    <div class="space"></div>
     <!-- Attendance Form -->
     <form method="POST" action="submit_attendance.php">
         <input type="hidden" name="course_id" id="hiddenCourseId">
@@ -136,6 +142,7 @@ while ($row = $course_result->fetch_assoc()) {
                 <!-- Student rows will be populated here -->
             </tbody>
         </table>
+        <div class="space"></div>
         <button type="submit">Submit Attendance</button>
     </form>
 
@@ -149,3 +156,107 @@ while ($row = $course_result->fetch_assoc()) {
 </body>
 
 </html>
+<style>
+    h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #5752e3;
+        /* Updated color theme */
+    }
+
+    form {
+        background: white;
+        padding: 40px;
+        /* Increased padding for form */
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        /* Enhanced shadow for a deeper effect */
+        margin: 0 auto;
+        max-width: 800px;
+        /* Increased max-width for a bigger container */
+    }
+
+    label {
+        display: block;
+        margin: 25px 0 8px;
+        /* Increased margin for label */
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    select,
+    input[type="date"],
+    button {
+        width: 100%;
+        padding: 15px;
+        /* Increased padding for better click area */
+        margin-bottom: 25px;
+        /* Increased margin for spacing */
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+    }
+
+    select:focus,
+    input[type="date"]:focus {
+        border-color: #5752e3;
+        /* Updated border color to match theme */
+        outline: none;
+    }
+
+    button {
+        background-color: #5752e3;
+        /* Updated button background color */
+        color: white;
+        font-size: 1.1em;
+        cursor: pointer;
+        border: none;
+    }
+
+    button:hover {
+        background-color: #4744c0;
+        /* Darker shade for hover effect */
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+        /* Slightly increased margin for spacing */
+    }
+
+    th,
+    td {
+        padding: 15px;
+        /* Increased padding for table cells */
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #5752e3;
+        /* Header color matching theme */
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #e9ecef;
+        /* Highlight on row hover */
+    }
+
+    input[type="checkbox"] {
+        width: 24px;
+        /* Slightly larger checkbox */
+        height: 24px;
+        /* Slightly larger checkbox */
+    }
+
+    .space {
+        height: 20px;
+    }
+</style>
