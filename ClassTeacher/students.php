@@ -74,7 +74,7 @@ $studentsResult = $studentsStmt->get_result();
 
         th {
             background-color: #5752e3;
-            color: #000
+            color: #000;
         }
 
         tr:hover {
